@@ -18,7 +18,7 @@ export const register = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 15);
     await User.create({ username, email, password: hashedPassword });
-    return res.status(200).json({ message: "Account created successfully" });
+    return res.status(200).json({ message: "Account created successfully", success: true });
   } catch (error) {
     console.log(error);
   }
@@ -38,13 +38,23 @@ export const login = async (req, res) => {
         .status(400)
         .json({ message: "User does not exist", success: false });
     }
-    const hashedPassword = await bcrypt.hash(password, 15);
-    const isPasswordValid = await bcrypt.compare(hashedPassword, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res
         .status(400)
         .json({ message: "Invalid credentials", success: false });
     }
+
+    user = {
+      _id: user._id,
+      username: user.username,
+      bio: user.bio,
+      avatar: user.avatar,
+      followers: user.followers,
+      following: user.following,
+      posts: user.posts,
+    };
+
     const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "7d",
     });
@@ -55,8 +65,136 @@ export const login = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(200)
-      .json({ message: "Login successful", success: true });
+      .json({ message: `Welcome back ${user.username}`, success: true });
   } catch (error) {
+    console.log(error);
+  }
+};
+
+export const logout = async (_, res) => {
+  try {
+    res
+      .cookie("token", "", { maxAge: 0 })
+      .json({ message: "Logged out successfully", success: true });
+  } catch(error) {
+    console.log(error);
+  }
+};
+
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID", success: false });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "User does not exist", success: false });
+    }
+    return res.status(200).json({ user, success: true });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+
+export const editProfile = async (req, res) => {
+  try {
+    const userId = req.id;
+    let cloudResponse;
+    const { bio, gender } = req.body;
+    const avatar = req.file;
+
+    if (avatar) {
+      const fileUri = getDataUri(avatar);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri);
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "User does not exist", success: false });
+    }
+    if (bio) {
+      user.bio = bio;
+    }
+    if (gender) {
+      user.gender = gender;
+    }
+    if (avatar) {
+      user.avatar = cloudResponse.secure_url;
+    }
+
+    await user.save();
+    return res.status(200).json({ user, success: true });
+  } catch(error) {
+    console.log(error);
+  }
+};
+
+export const getSuggestions = async (req, res) => {
+  try {
+    const userId = req.id;
+    const user = await User.findById({ _id: { $ne: userId } });
+    const suggestions = await User.find({ _id: { $ne: userId } }).select([
+      -"password",
+    ]);
+    if (!suggestions) {
+      return res
+        .status(400)
+        .json({ message: "Currently user's does not exist", success: false });
+    }
+    return res.status(200).json({ suggestions, success: true });
+  } catch(error) {
+    console.log(error);
+  }
+};
+
+export const followandunfollow = async (req, res) => {
+  try {
+    const userId = req.id;
+    const followId = req.params.id;
+
+    if (userId === followId) {
+      return res
+        .status(400)
+        .json({ message: "Cannot follow yourself", success: false });
+    }
+
+    const user = await User.findById(userId);
+    const followUser = await User.findById(followId);
+    if (!user || !followUser) {
+      return res
+        .status(400)
+        .json({ message: "User does not exist", success: false });
+    }
+    if (user.following.includes(followId)) {
+      user.following = user.following
+        .filter((id) => id !== followId)
+        .json({
+          message: "Unfollowed successfully",
+          success: true,
+        });
+      followUser.followers = followUser.followers.filter((id) => id !== userId);
+    } else {
+      user.following.push(followId).json({
+        message: "Followed successfully",
+        success: true,
+      });
+      followUser.followers.push(userId);
+    }
+    await user.save();
+    await followUser.save();
+    return res
+      .status(200)
+      .json({ message: "Updated successfully", user, success: true });
+  } catch(error) {
     console.log(error);
   }
 };
