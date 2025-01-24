@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
+    default: "",
   },
   bio: {
     type: String,
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   gender: {
       type: String,
-      enum: ["male", "female"]
+      enum: ["Male", "Female"]
   },
   followers: [
     {

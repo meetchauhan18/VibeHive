@@ -18,7 +18,9 @@ export const register = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 15);
     await User.create({ username, email, password: hashedPassword });
-    return res.status(200).json({ message: "Account created successfully", success: true });
+    return res
+      .status(200)
+      .json({ message: "Account created successfully", success: true });
   } catch (error) {
     console.log(error);
   }
@@ -32,7 +34,7 @@ export const login = async (req, res) => {
         .status(400)
         .json({ message: "All fields are required", success: false });
     }
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
       return res
         .status(400)
@@ -56,41 +58,41 @@ export const login = async (req, res) => {
     };
 
     const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "7d",
+      expiresIn: "1d",
     });
+
     return res
       .cookie("token", token, {
         httpOnly: true,
         sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 1 * 24 * 60 * 60 * 1000,
       })
       .status(200)
-      .json({ message: `Welcome back ${user.username}`, success: true });
+      .json({
+        message: `Welcome back ${user.username} \n Login successful`,
+        success: true,
+        user: user,
+      });
   } catch (error) {
     console.log(error);
   }
 };
 
-export const logout = async (_, res) => {
+export const logout = async (req, res) => {
   try {
     res
-      .cookie("token", "", { maxAge: 0 })
+      .clearCookie("token", "")
+      .status(200)
       .json({ message: "Logged out successfully", success: true });
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 };
 
 export const getProfile = async (req, res) => {
   try {
-    const userId = req.params.id;
-
-    // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ message: "Invalid user ID", success: false });
-    }
-
-    const user = await User.findById(userId);
+    // get profile using username
+    const user = await User.findOne({ username: req.params.username });
     if (!user) {
       return res
         .status(400)
@@ -110,11 +112,6 @@ export const editProfile = async (req, res) => {
     const { bio, gender } = req.body;
     const avatar = req.file;
 
-    if (avatar) {
-      const fileUri = getDataUri(avatar);
-      const cloudResponse = await cloudinary.uploader.upload(fileUri);
-    }
-
     const user = await User.findById(userId);
     if (!user) {
       return res
@@ -128,12 +125,14 @@ export const editProfile = async (req, res) => {
       user.gender = gender;
     }
     if (avatar) {
+      const fileUri = getDataUri(avatar);
+      cloudResponse = await cloudinary.uploader.upload(fileUri);
       user.avatar = cloudResponse.secure_url;
     }
 
     await user.save();
     return res.status(200).json({ user, success: true });
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 };
@@ -151,7 +150,7 @@ export const getSuggestions = async (req, res) => {
         .json({ message: "Currently user's does not exist", success: false });
     }
     return res.status(200).json({ suggestions, success: true });
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 };
@@ -194,7 +193,7 @@ export const followandunfollow = async (req, res) => {
     return res
       .status(200)
       .json({ message: "Updated successfully", user, success: true });
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 };
