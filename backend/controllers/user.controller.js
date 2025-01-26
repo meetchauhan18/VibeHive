@@ -5,6 +5,20 @@ import jwt from "jsonwebtoken";
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+
+    isUsernameTaken = await User.findOne({ username });
+    if(isUsernameTaken){
+      return res
+        .status(400)
+        .json({ message: "Username already exists", success: false });
+    }
+    
+    if(username.length < 3){
+      return res
+        .status(400)
+        .json({ message: "Username must be at least 3 characters", success: false });
+    }
+
     if (!username || !email || !password) {
       return res
         .status(400)
@@ -139,17 +153,15 @@ export const editProfile = async (req, res) => {
 
 export const getSuggestions = async (req, res) => {
   try {
-    const userId = req.id;
-    const user = await User.findById({ _id: { $ne: userId } });
-    const suggestions = await User.find({ _id: { $ne: userId } }).select([
-      -"password",
+    const suggestions = await User.find({ _id: { $ne: req.id } }).select([
+      "-password",
     ]);
     if (!suggestions) {
       return res
         .status(400)
         .json({ message: "Currently user's does not exist", success: false });
     }
-    return res.status(200).json({ suggestions, success: true });
+    return res.status(200).json({ success: true, users: suggestions });
   } catch (error) {
     console.log(error);
   }
@@ -158,41 +170,51 @@ export const getSuggestions = async (req, res) => {
 export const followandunfollow = async (req, res) => {
   try {
     const userId = req.id;
-    const followId = req.params.id;
+    const followUsername = req.params.username;
+    const user = await User.findById(userId).select(["-password"]);
+    const followUser = await User.findOne({ username: followUsername }).select([
+      "-password",
+    ]);
+    const followId = followUser._id;
 
-    if (userId === followId) {
-      return res
-        .status(400)
-        .json({ message: "Cannot follow yourself", success: false });
-    }
-
-    const user = await User.findById(userId);
-    const followUser = await User.findById(followId);
     if (!user || !followUser) {
       return res
         .status(400)
         .json({ message: "User does not exist", success: false });
     }
-    if (user.following.includes(followId)) {
-      user.following = user.following
-        .filter((id) => id !== followId)
-        .json({
-          message: "Unfollowed successfully",
-          success: true,
-        });
-      followUser.followers = followUser.followers.filter((id) => id !== userId);
-    } else {
-      user.following.push(followId).json({
-        message: "Followed successfully",
+
+    // Debugging statements
+    console.log(`userId: ${userId}`);
+    console.log(`followId: ${followId}`);
+
+    if (userId.toString() === followId.toString()) {
+      return res
+        .status(400)
+        .json({ message: "Cannot follow yourself", success: false });
+    }
+
+
+    if (
+      user.following.includes(followId)
+    ) {
+      user.following = user.following.filter((id) => id === followId);
+      followUser.followers = followUser.followers.filter((id) => id === userId);
+      await user.save();
+      await followUser.save();
+      return res.json({
+        currentuser: user.username,
+        message: `Unfollowed ${followUser.username} successfully`,
         success: true,
       });
-      followUser.followers.push(userId);
     }
+    user.following.push(followId);
+    followUser.followers.push(userId);
     await user.save();
     await followUser.save();
-    return res
-      .status(200)
-      .json({ message: "Updated successfully", user, success: true });
+    return res.json({
+      message: `Followed ${followUser.username} successfully`,
+      success: true,
+    });
   } catch (error) {
     console.log(error);
   }

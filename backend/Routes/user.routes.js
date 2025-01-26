@@ -9,15 +9,16 @@ import {
     editProfile,
     getSuggestions
 } from "../controllers/user.controller.js";
-import isAuthenticated from '../middlewares/isAuthenticated.js'; // Ensure the correct path and case
-import upload from '../middlewares/multer.js'; // Ensure the correct path and case
+import isAuthenticated from '../middlewares/isAuthenticated.js';
+import upload from '../middlewares/multer.js';
 
 router.route("/signup").post(register);
 router.route("/signin").post(login);
 router.route("/logout").get(logout);
-router.get("/:username", isAuthenticated, getProfile); // Apply isAuthenticated middleware
+router.get("/:username", isAuthenticated, getProfile);
 router.post("/accounts/edit", isAuthenticated, upload.single("avatar"), editProfile);
-router.post("/:id/profile", isAuthenticated, followandunfollow);
-router.get("/suggestions", isAuthenticated, getSuggestions);
+router.get("/user/suggestions", isAuthenticated, getSuggestions);
+router.post("/:username", isAuthenticated, followandunfollow);
+
 
 export default router;
