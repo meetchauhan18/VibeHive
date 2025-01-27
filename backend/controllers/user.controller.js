@@ -6,7 +6,7 @@ export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    isUsernameTaken = await User.findOne({ username });
+     const isUsernameTaken = await User.findOne({ username });
     if(isUsernameTaken){
       return res
         .status(400)

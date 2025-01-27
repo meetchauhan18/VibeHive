@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 
 const postSchema = new mongoose.Schema({
-    content: {
+    captions: {
         type: String,
     },
-    media: {
+    postMedia: {
         type: [String],
     },
-    author: {
+    authorId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
