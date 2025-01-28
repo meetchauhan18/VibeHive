@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const  messageSchema = new mongoose.Schema({
+    members: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "User",
+    },
     senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
