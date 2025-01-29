@@ -1,11 +1,12 @@
-import { Signup } from '../pages/Signup.jsx'
+// import { Signup } from './pages/Signup.jsx'
 import './App.css'
+import Signin from './pages/Signin.jsx'
 
 function App() {
 
   return (
     <>
-    <Signup />
+    <Signin />
     </>
   )
 }
