@@ -1,42 +1,47 @@
-import User from "../models/user.model.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/user.model.js';
+
 
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
-     const isUsernameTaken = await User.findOne({ username });
-    if(isUsernameTaken){
-      return res
-        .status(400)
-        .json({ message: "Username already exists", success: false });
-    }
-    
-    if(username.length < 3){
-      return res
-        .status(400)
-        .json({ message: "Username must be at least 3 characters", success: false });
-    }
 
     if (!username || !email || !password) {
       return res
         .status(400)
         .json({ message: "All fields are required", success: false });
     }
-    const user = await User.findOne({ email });
-    if (user) {
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res
         .status(400)
         .json({ message: "Email already exists", success: false });
     }
+
     const hashedPassword = await bcrypt.hash(password, 15);
-    await User.create({ username, email, password: hashedPassword });
+    const newUser = await User.create({ username, email, password: hashedPassword });
+
+    const token = await jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1d",
+    });
+
     return res
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 1 * 24 * 60 * 60 * 1000,
+      })
       .status(200)
-      .json({ message: "Account created successfully", success: true });
+      .json({
+        message: `Welcome ${newUser.username}, your account has been created successfully`,
+        success: true,
+        user: newUser,
+      });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ message: "Server error", success: false });
   }
 };
 
@@ -193,10 +198,7 @@ export const followandunfollow = async (req, res) => {
         .json({ message: "Cannot follow yourself", success: false });
     }
 
-
-    if (
-      user.following.includes(followId)
-    ) {
+    if (user.following.includes(followId)) {
       user.following = user.following.filter((id) => id === followId);
       followUser.followers = followUser.followers.filter((id) => id === userId);
       await user.save();

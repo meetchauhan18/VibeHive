@@ -1,11 +1,13 @@
-import "./App.css";
+import { Signup } from '../pages/Signup.jsx'
+import './App.css'
 
 function App() {
+
   return (
     <>
-      <h1 className="text-9xl font-bold ">Vite + React</h1>
+    <Signup />
     </>
-  );
+  )
 }
 
-export default App;
+export default App
