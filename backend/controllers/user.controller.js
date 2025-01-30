@@ -12,9 +12,9 @@ export const register = async (req, res) => {
         .json({ message: "All fields are required", success: false });
     }
 
-    const existingUser = await User.findOne(
-      $or[({ username: username }, { email: email })]
-    );
+    const existingUser = await User.findOne({
+      $or: [{ username: username }, { email: email }],
+    });
     if (existingUser) {
       return res
         .status(400)

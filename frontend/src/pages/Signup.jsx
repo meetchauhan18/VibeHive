@@ -2,8 +2,10 @@ import React from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import Carousel from "../components/Carousel.jsx";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
     username: "",
     email: "",
@@ -22,7 +24,7 @@ export const Signup = () => {
     console.log(formData);
     try {
       const res = await axios.post(
-        `http://localhost:8000/hive/signup`,
+        `http://localhost:6000/hive/signup`,
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -32,6 +34,7 @@ export const Signup = () => {
       if (res.status === 200) {
         console.log(res.data.message);
         toast.success(res.data.message);
+        navigate("/");
       }
     } catch (error) {
       console.log(error);
@@ -50,14 +53,17 @@ export const Signup = () => {
           className="signup-form flex flex-col items-center justify-center bg-white h-auto w-92 gap-4 p-10"
         >
           <div className="signup-header flex flex-row items-center justify-center h-16 w-full gap-2">
-            <img
-              className="signup-logo w-16 h-16"
-              src="src\assets\Images\Logo\VibeHive-logo-removebg.png"
-              alt="Logo"
-            />
+          <img className="h-20 w-20" src="/Images/Logo/VibeHive-logo-removebg.png" alt="VibeHive Logo" />
             <p className="signup-title text-3xl font-light">VibeHive</p>
           </div>
-          <button className="signup-google-button flex flex-row items-center justify-center gap-4 border border-gray-400 rounded-md h-12 w-full hover:bg-gray-100 cursor-pointer">
+          <span
+            onClick={() => {
+              toast.message("Work in progress", {
+                description: "Estimated to be added in the future",
+              });
+            }}
+            className="signup-google-button flex flex-row items-center justify-center gap-4 border border-gray-400 rounded-md h-12 w-full hover:bg-gray-100 cursor-pointer"
+          >
             <svg
               width="18"
               height="18"
@@ -93,7 +99,7 @@ export const Signup = () => {
             <p className="signup-google-button-text text-sm font-semibold">
               Sign up with Google (Coming Soon)
             </p>
-          </button>
+          </span>
           <div className="signup-or flex items-center m-2 p-2 w-full gap-2">
             <hr className=" flex-grow border-t border-gray-500" />
             <span className="font-bold text-black">OR</span>
@@ -138,9 +144,9 @@ export const Signup = () => {
           </div>
           <div className="signup-checkbox flex justify-center items-center gap-2 w-full">
             <p className="text-md">Already have an account?</p>
-            <a href="#" className="text-blue-600 text-md">
+            <Link to="/accounts/signin" className="text-blue-600 text-md">
               Log in
-            </a>
+            </Link>
           </div>
         </form>
       </div>

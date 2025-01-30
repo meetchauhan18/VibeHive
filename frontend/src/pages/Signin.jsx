@@ -2,8 +2,10 @@ import React from "react";
 import Carousel from "../components/Carousel.jsx";
 import axios from "axios";
 import { toast } from "sonner";
+import { Link, useNavigate } from "react-router-dom";
 
-const Signin = () => {
+export const Signin = () => {
+  const navigate = useNavigate();
 
   const [formData, setFormData] = React.useState({
     usernameoremail: "",
@@ -22,9 +24,8 @@ const Signin = () => {
     console.log(formData);
 
     try {
-
       const res = await axios.post(
-        "http://localhost:8000/hive/signin",
+        "http://localhost:6000/hive/signin",
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -33,6 +34,8 @@ const Signin = () => {
       );
 
       if (res.status === 200) {
+        navigate("/");
+
         console.log(res.data.message);
         toast.success(res.data.message);
       }
@@ -44,7 +47,7 @@ const Signin = () => {
   }
 
   return (
-    <div className="signin-container flex flex-col justify-center items-center h-auto w-full bg-[#e6e6e6] gap-10 py-10 overflow-y-auto overflow-x-auto" style={{ backgroundImage: 'url(https://example.com/your-live-image.jpg)' }}>
+    <div className="signin-container flex flex-col justify-center items-center h-auto w-full bg-[#e6e6e6] gap-10 py-10 overflow-y-auto overflow-x-auto">
       <div className="form-container form-container flex items-center justify-center h-auto max-w-full shadow-2xl">
         <div className="form-img-container max-w-full hidden lg:block">
           <Carousel />
@@ -55,9 +58,9 @@ const Signin = () => {
         >
           <div className="signin-header flex flex-row items-center justify-center h-16 w-full gap-2">
             <img
-              className="signin-logo w-16 h-16"
-              src="src\assets\Images\Logo\VibeHive-logo-removebg.png"
-              alt="Logo"
+              className="h-20 w-20"
+              src="/Images/Logo/VibeHive-logo-removebg.png"
+              alt="VibeHive Logo"
             />
             <p className="signin-title text-3xl font-light">VibeHive</p>
           </div>
@@ -142,9 +145,9 @@ const Signin = () => {
           </div>
           <div className="signin-checkbox flex justify-center items-center gap-2 w-full">
             <p className="text-md">Don&apos;t have an account?</p>
-            <a href="#" className="text-blue-600 text-md">
+            <Link to="/accounts/signup" className="text-blue-600 text-md">
               Sign up
-            </a>
+            </Link>
           </div>
         </form>
       </div>
@@ -182,5 +185,3 @@ const Signin = () => {
     </div>
   );
 };
-
-export default Signin;
