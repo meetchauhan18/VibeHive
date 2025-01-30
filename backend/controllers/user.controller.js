@@ -1,7 +1,6 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.model.js';
-
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/user.model.js";
 
 export const register = async (req, res) => {
   try {
@@ -13,19 +12,30 @@ export const register = async (req, res) => {
         .json({ message: "All fields are required", success: false });
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne(
+      $or[({ username: username }, { email: email })]
+    );
     if (existingUser) {
       return res
         .status(400)
-        .json({ message: "Email already exists", success: false });
+        .json({ message: "User already exists!", success: false });
     }
 
     const hashedPassword = await bcrypt.hash(password, 15);
-    const newUser = await User.create({ username, email, password: hashedPassword });
 
-    const token = await jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1d",
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
     });
+
+    const token = jwt.sign(
+      { id: newUser._id },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "1d",
+      }
+    );
 
     return res
       .cookie("token", token, {
@@ -47,19 +57,26 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const { usernameoremail, password } = req.body;
+
+    if (!usernameoremail || !password) {
       return res
         .status(400)
         .json({ message: "All fields are required", success: false });
     }
-    let user = await User.findOne({ email });
+
+    let user = await User.findOne({
+      $or: [{ username: usernameoremail }, { email: usernameoremail }],
+    });
+
     if (!user) {
       return res
         .status(400)
         .json({ message: "User does not exist", success: false });
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid) {
       return res
         .status(400)
@@ -76,7 +93,7 @@ export const login = async (req, res) => {
       posts: user.posts,
     };
 
-    const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "1d",
     });
 

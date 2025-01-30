@@ -1,7 +1,10 @@
 import React from "react";
-import Carousel from "../components/Carousel";
+import Carousel from "../components/Carousel.jsx";
+import axios from "axios";
+import { toast } from "sonner";
 
 const Signin = () => {
+
   const [formData, setFormData] = React.useState({
     usernameoremail: "",
     password: "",
@@ -13,35 +16,52 @@ const Signin = () => {
       [event.target.name]: event.target.value,
     });
   }
+
   async function handleSubmit(event) {
     event.preventDefault();
     console.log(formData);
+
     try {
-      //
+
+      const res = await axios.post(
+        "http://localhost:8000/hive/signin",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+
+      if (res.status === 200) {
+        console.log(res.data.message);
+        toast.success(res.data.message);
+      }
     } catch (error) {
       console.error(error);
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
     }
   }
 
   return (
-    <div className="signin-container flex flex-col justify-center items-center h-auto w-full bg-[#e6e6e6] gap-10 py-10 overflow-y-auto overflow-x-auto">
-      <div className="form-container form-container flex flex-row items-center justify-center h-auto w-auto shadow-2xl">
-        <div className="form-img-container hidden xl:block">
+    <div className="signin-container flex flex-col justify-center items-center h-auto w-full bg-[#e6e6e6] gap-10 py-10 overflow-y-auto overflow-x-auto" style={{ backgroundImage: 'url(https://example.com/your-live-image.jpg)' }}>
+      <div className="form-container form-container flex items-center justify-center h-auto max-w-full shadow-2xl">
+        <div className="form-img-container max-w-full hidden lg:block">
           <Carousel />
         </div>
         <form
           onSubmit={handleSubmit}
-          className="signup-form flex flex-col items-center justify-center bg-white h-auto w-92 gap-4 p-10"
+          className="signin-form flex flex-col items-center justify-center bg-white h-170 min-w-92 gap-4 p-10"
         >
-          <div className="signup-header flex flex-row items-center justify-center h-16 w-full gap-2">
+          <div className="signin-header flex flex-row items-center justify-center h-16 w-full gap-2">
             <img
-              className="signup-logo w-16 h-16"
+              className="signin-logo w-16 h-16"
               src="src\assets\Images\Logo\VibeHive-logo-removebg.png"
               alt="Logo"
             />
-            <p className="signup-title text-3xl font-light">VibeHive</p>
+            <p className="signin-title text-3xl font-light">VibeHive</p>
           </div>
-          <button className="signup-google-button flex flex-row items-center justify-center gap-4 border border-gray-400 rounded-md h-12 w-full hover:bg-gray-100 cursor-pointer">
+          <button className="signin-google-button flex flex-row items-center justify-center gap-3 border border-gray-400 rounded-md h-12 w-full hover:bg-gray-100 cursor-pointer">
             <svg
               width="18"
               height="18"
@@ -74,58 +94,53 @@ const Signin = () => {
                 fill="#4285F4"
               />
             </svg>
-            <p className="signup-google-button-text text-sm font-semibold">
-              Sign up with Google (Coming Soon)
+            <p className="signin-google-button-text text-sm font-semibold">
+              Sign in with Google (Coming Soon)
             </p>
           </button>
-          <div className="signup-or flex items-center m-2 p-2 w-full gap-2">
+          <div className="signin-or flex items-center m-2 p-2 w-full gap-2">
             <hr className=" flex-grow border-t border-gray-500" />
             <span className="font-bold text-black">OR</span>
             <hr className="flex-grow border-t border-gray-500" />
           </div>
           <input
-            className="signup-input username w-full border border-gray-500 rounded-md p-3"
+            className="signin-input usernameoremail w-full border border-gray-500 rounded-md p-3"
             type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
+            name="usernameoremail"
+            placeholder="Email or username"
+            value={formData.usernameoremail}
             onChange={handleChange}
+            required
           />
           <input
-            className="signup-input email w-full border border-gray-500 rounded-md p-3"
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <input
-            className="signup-input password w-full border border-gray-500 rounded-md p-3"
+            className="signin-input password w-full border border-gray-500 rounded-md p-3"
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
             placeholder="Password"
+            required
           />
-          <div className="signup-checkbox flex items-center gap-2 w-full">
+          <div className="signin-checkbox flex items-center gap-2 w-full">
             <input
               type="checkbox"
               name="checkbox"
               id="checkbox"
               className="w-4 h-4"
+              required
             />
             <p className="text-sm">I agree to the Terms and Privacy Policy.</p>
           </div>
           <button
             type="submit"
-            className="signup-button w-full bg-black text-white border-2 border-black-500 rounded-md mt-4 p-3 hover:bg-white hover:text-black transition duration-200 cursor-pointer"
+            className="signin-button w-full bg-black text-white border-2 border-black-500 rounded-md mt-4 p-3 hover:bg-white hover:text-black transition duration-200 cursor-pointer"
           >
             Sign in
           </button>
-          <div className="signup-or flex items-center m-2 p-2 w-full gap-2">
+          <div className="signin-or flex items-center m-2 p-2 w-full gap-2">
             <hr className=" flex-grow border-t border-gray-500" />
           </div>
-          <div className="signup-checkbox flex justify-center items-center gap-2 w-full">
+          <div className="signin-checkbox flex justify-center items-center gap-2 w-full">
             <p className="text-md">Don&apos;t have an account?</p>
             <a href="#" className="text-blue-600 text-md">
               Sign up
