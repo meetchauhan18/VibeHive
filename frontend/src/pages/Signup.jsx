@@ -53,7 +53,7 @@ export const Signup = () => {
           className="signup-form flex flex-col items-center justify-center bg-white h-auto w-92 gap-4 p-10"
         >
           <div className="signup-header flex flex-row items-center justify-center h-16 w-full gap-2">
-          <img className="h-20 w-20" src="/Images/Logo/VibeHive-logo-removebg.png" alt="VibeHive Logo" />
+          <img className="h-20 w-20" src="/src/assets/Images/Logo/VibeHive-logo-removebg.png" alt="VibeHive Logo" />
             <p className="signup-title text-3xl font-light">VibeHive</p>
           </div>
           <span

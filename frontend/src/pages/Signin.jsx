@@ -59,7 +59,7 @@ export const Signin = () => {
           <div className="signin-header flex flex-row items-center justify-center h-16 w-full gap-2">
             <img
               className="h-20 w-20"
-              src="/Images/Logo/VibeHive-logo-removebg.png"
+              src="/src/assets/Images/Logo/VibeHive-logo-removebg.png"
               alt="VibeHive Logo"
             />
             <p className="signin-title text-3xl font-light">VibeHive</p>
