@@ -1,3 +1,6 @@
+import React, { useCallback, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Switch } from "@mui/material";
 import {
   RiNotification2Line,
   RiHome5Line,
@@ -16,220 +19,252 @@ import {
   RiArrowLeftSLine,
 } from "@remixicon/react";
 import Avatar from "@mui/material/Avatar";
-import { Link } from "react-router-dom";
-import React from "react";
-import { Switch } from "@mui/material";
+import axios from "axios";
+import { toast } from "sonner";
 
 export const SidebarLeft = () => {
   const [checked, setChecked] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showBottomItems, setShowBottomItems] = React.useState(false);
+  const navigate = useNavigate();
 
-  const handleChange = () => {
-    setChecked(!checked);
-  };
-
+  const handleChange = () => setChecked(!checked);
   const handleBottomItemClick = (label) => {
     setSelectedItem(label === selectedItem ? null : label);
     setShowBottomItems(false);
   };
-
-  const handleBackButtonClick = () => {
-    setSelectedItem(null);
-    setShowBottomItems(true);
-  };
-
   const handleToggleSideBarClick = () => {
     setShowBottomItems(!showBottomItems);
     setSelectedItem(null);
-    setChecked(false);
   };
 
+  const handleLogout = useCallback(async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/hive/logout", {
+        withCredentials: true,
+      });
+
+      if (res.status === 200) {
+        toast.success(res.data.message);
+        navigate("/accounts/signin");
+      }
+
+      console.log(res);
+    } catch (error) {
+      console.error(error.response.data.message);
+    }
+  }, [navigate]);
+
   const SidebarLeftItems = [
+    { icon: <RiHome5Line size={30} color="black" />, label: "Home", path: "/" },
     {
-      icon: <RiHome5Line size={30} color="black" className="my-icon" />,
-      label: "Home",
-    },
-    {
-      icon: <RiSearchLine size={30} color="black" className="my-icon" />,
+      icon: <RiSearchLine size={30} color="black" />,
       label: "Search",
+      path: "/search",
     },
     {
-      icon: <RiGlobalLine size={30} color="black" className="my-icon" />,
+      icon: <RiGlobalLine size={30} color="black" />,
       label: "Explore",
+      path: "/explore",
     },
     {
-      icon: <RiCamera2Line size={30} color="black" className="my-icon" />,
+      icon: <RiCamera2Line size={30} color="black" />,
       label: "Buzz",
+      path: "/buzz",
     },
     {
-      icon: <RiMessage3Line size={30} color="black" className="my-icon" />,
+      icon: <RiMessage3Line size={30} color="black" />,
       label: "Messages",
+      path: "/messages",
     },
     {
-      icon: <RiNotification2Line size={30} color="black" className="my-icon" />,
+      icon: <RiNotification2Line size={30} color="black" />,
       label: "Notification",
+      path: "/notifications",
     },
     {
-      icon: <RiAddBoxLine size={30} color="black" className="my-icon" />,
+      icon: <RiAddBoxLine size={30} color="black" />,
       label: "Create",
+      path: "/create",
     },
     {
       icon: (
         <Avatar
-          alt="Remy Sharp"
+          alt="Profile"
           src="/src/assets/Images/CarouselsImages/KunalMeet.jpg"
           sx={{ width: 28, height: 28 }}
         />
       ),
       label: "Profile",
+      path: "/profile",
     },
   ];
 
   const SidebarLeftBottomItems = [
+    { icon: <RiSettings2Line size={28} color="black" />, label: "Settings" },
     {
-      icon: (
-        <RiSettings2Line
-          size={28}
-          color="black"
-          className="ToggleSideBarIcon"
-        />
-      ),
-      label: "Settings",
-    },
-    {
-      icon: (
-        <RiLineChartLine
-          size={28}
-          color="black"
-          className="TimeLineSidebarIcon"
-        />
-      ),
+      icon: <RiLineChartLine size={28} color="black" />,
       label: "Your timeline",
     },
-    {
-      icon: (
-        <RiBookmark3Line
-          size={28}
-          color="black"
-          className="BookmarkSidebarIcon"
-        />
-      ),
-      label: "Bookmarks",
-    },
+    { icon: <RiBookmark3Line size={28} color="black" />, label: "Bookmarks" },
     {
       icon: checked ? (
-        <RiMoonLine size={28} color="black" className="ThemeSideBarIcon" />
+        <RiMoonLine size={28} color="black" />
       ) : (
-        <RiSunLine size={28} color="black" className="ToggleSideBarIcon" />
+        <RiSunLine size={28} color="black" />
       ),
       label: "Theme appearance",
     },
     {
-      icon: (
-        <RiErrorWarningLine
-          size={28}
-          color="black"
-          className="ReportProblemSidebarIcon"
-        />
-      ),
+      icon: <RiErrorWarningLine size={28} color="black" />,
       label: "Report a problem",
     },
-    {
-      icon: "",
-      label: "Logout",
-    },
+    { icon: "", label: "Logout" },
   ];
 
   return (
-    <div className="fixed top-0 left-0 bg-[#e6e6e6] h-screen w-62 flex flex-col items-center justify-center">
-      <div className="logo-container fixed top-0 left-0 p-10 flex w-full items-center">
-        <p className="text-4xl font-light text-[#000000]">VibeHive</p>
+    <>
+      <div className="SidebarLeft hidden lg:flex md:flex sm:flex flex-col justify-end bg-[#e6e6e6] h-screen w-18 lg:w-62 fixed top-0 left-0 overflow-visible">
+        <Link
+          to="/"
+          className="Logo fixed md:left-1 top-4 text-4xl px-0 lg:px-10 xl:px-10 py-4 font-light text-black"
+        >
+          <span className="hidden lg:block">VibeHive</span>
+          <img
+            src="/src/assets/Images/Logo/VibeHive-logo-removebg.png"
+            alt="Logo"
+            className="hidden lg:hidden md:block sm:block w-16 h-16 hover:scale-130 transition duration-300 ease-in-out cursor-pointer"
+          />
+        </Link>
+
+        <div className="SidebarLeftItemsContainer flex flex-col p-2 mb-18">
+          {SidebarLeftItems.map((item, index) => (
+            <Link
+              to={item.path}
+              className="flex items-center gap-4 px-0 justify-center lg:px-8 lg:justify-start py-3 hover:bg-white rounded-xl transition duration-300 ease-in-out cursor-pointer"
+              key={index}
+            >
+              {item.icon}
+              <p className="text-lg font-semibold text-black hidden lg:block">
+                {item.label}
+              </p>
+            </Link>
+          ))}
+        </div>
+
+        <div className="BottomSideBarContainer p-2">
+          <span
+            onClick={handleToggleSideBarClick}
+            className="hidden lg:flex md:flex sm:flex xl:justify-start lg:justify-start md:justify-center sm:justify-center items-center gap-4 cursor-pointer hover:bg-white rounded-xl px-0 xl:px-8 lg:px-8 py-4 transition duration-300 ease-in-out"
+          >
+            <RiAlignJustify size={28} color="black" />
+            <div className="text-lg font-semibold text-black block lg:block md:hidden sm:hidden">
+              More
+            </div>
+          </span>
+          {showBottomItems && (
+            <div className="SidebarLeftBottomItemsContainer hidden md:flex sm:flex absolute bottom-20 left-2 bg-amber-400 p-2 lg:flex flex-col justify-start items-start rounded-2xl shadow-[2px_3px_3px_rgba(0,0,0,0.35)]">
+              {SidebarLeftBottomItems.map((item, index) => (
+                <Link
+                  to={item.path}
+                  onClick={() => handleBottomItemClick(item.label)}
+                  className="flex items-center w-full gap-4 px-8 py-4 hover:bg-white rounded-xl transition duration-300 ease-in-out cursor-pointer"
+                  key={index}
+                >
+                  {item.icon}
+                  <p className="text-md w-38 font-semibold text-black hidden lg:block md:block sm:block">
+                    {item.label}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="SidebarItem-Container fixed top-30 left-0 gap-2 h-full w-62 p-2 flex flex-col justify-start items-start">
-        {SidebarLeftItems.map((item, index) => (
+      {selectedItem && selectedItem === "Theme appearance" && (
+        <div className="absolute bottom-22 p-2 left-0 bg-amber-400 ml-2 rounded-2xl">
+          <span className="flex items-center gap-4 p-6 py-4">
+            <RiArrowLeftSLine
+              className="cursor-pointer"
+              size={28}
+              color="black"
+              onClick={() => {
+                setSelectedItem(null), setShowBottomItems(true);
+              }}
+            />
+            <p>{selectedItem}</p>
+            {checked ? (
+              <RiMoonLine size={28} color="black" />
+            ) : (
+              <RiSunLine size={28} color="black" />
+            )}
+          </span>
+          <span className="flex w-full justify-between items-center bg-amber-200 gap-4 px-7 py-4 rounded-xl hover:bg-white transition duration-300 ease-in-out">
+            <p className="text-lg font-semibold text-black">Dark Mode</p>
+            <Switch
+              color="warning"
+              type="checkbox"
+              checked={checked}
+              onChange={handleChange}
+            />
+          </span>
+        </div>
+      )}
+
+      {
+        useEffect(() => {
+          
+          if (selectedItem &&selectedItem === "Logout") {
+            handleLogout();
+          }
+        }, [handleLogout, selectedItem])
+
+    
+      }
+
+      <div className="lg:hidden md:hidden sm:hidden fixed bottom-0 left-0 w-full bg-[#e6e6e6] flex justify-around items-center p-2 shadow-md">
+        {SidebarLeftItems.filter(
+          (item) => item.label !== "Search" && item.label !== "Notification"
+        ).map((item, index) => (
           <Link
             to={item.path}
-            className="SidebarItem h-13 w-full flex justify-start items-center gap-5 px-10 hover:bg-[#ffffff] rounded-xl transition duration-300 ease-in-out"
+            className="flex flex-col items-center justify-center p-2 cursor-pointer hover:bg-white rounded-xl transition duration-300 ease-in-out"
             key={index}
           >
             {item.icon}
-            <p className="text-lg font-semibold text-[#000000]">{item.label}</p>
           </Link>
         ))}
-      </div>
 
-      <div className="SidebarBottom fixed bottom-0 left-0 gap-3 w-62 h-20 p-2 flex flex-col justify-center items-center">
         <span
           onClick={handleToggleSideBarClick}
-          className="SidebarBottomItem h-13 w-full flex justify-start items-center gap-5 px-10 hover:bg-[#ffffff] rounded-xl transition duration-300 ease-in-out cursor-pointer"
+          className="hidden lg:flex md:flex flex-col items-center justify-center p-2 cursor-pointer hover:bg-white rounded-xl transition duration-300 ease-in-out"
         >
-          <RiAlignJustify size={28} color="black" className="MoreIcon" />
-          <p className="text-lg font-semibold text-[#000000]">More</p>
+          <RiAlignJustify size={28} color="black" />
+          <p className="text-xs font-semibold text-black">More</p>
         </span>
-        {showBottomItems && (
-          <div className="SidebarBottomItem-Container absolute bottom-20 left-2 bg-amber-400 h-auto w-70 p-2 gap-[2px] flex flex-col justify-start items-start rounded-2xl shadow-[2px_3px_3px_rgba(0,0,0,0.35)] active:shadow-[2px_3px_3px_rgba(0,0,0,0.35)]">
-            {SidebarLeftBottomItems.map((item, index) => (
-              <span
-                onClick={() => handleBottomItemClick(item.label)}
-                className="SidebarBottomItem h-13 w-full flex justify-start items-center gap-5 px-8 hover:bg-[#ffffff] rounded-xl transition duration-300 ease-in-out cursor-pointer"
-                key={index}
-              >
-                {item.icon}
-                <p className="text-md font-semibold text-[#000000]">
-                  {item.label}
-                </p>
-              </span>
-            ))}
-          </div>
-        )}
-        {selectedItem && selectedItem === "Theme appearance" && (
-          <div className="ThemeToggleContainer absolute bottom-18 left-0 w-66 h-26 mx-2 flex flex-col justify-center items-start bg-amber-300 rounded-2xl transition duration-300 ease-in-out">
-            <span className="ThemeLabelHeader h-10 w-full px-4  flex justify-between items-center">
-              <span className="flex w-full">
-                {
-                  <RiArrowLeftSLine
-                    className="cursor-pointer"
-                    onClick={handleBackButtonClick}
-                    size={28}
-                    color="black"
-                  />
-                }{" "}
-                <p className="text-md font-semibold text-[#000000]">
-                  Theme appearence
-                </p>
-              </span>
 
-              {checked ? (
-                <RiMoonLine
-                  size={28}
-                  color="black"
-                  className="ToggleSideBarIcon"
-                />
-              ) : (
-                <RiSunLine
-                  size={28}
-                  color="black"
-                  className="ToggleSideBarIcon"
-                />
-              )}
-            </span>
-            <span className="labelToggle w-full flex justify-center items-center px-2">
-              <label className="ThemeToggleLabel flex justify-center items-center h-13 bg-amber-100 w-full text-md font-semibold text-[#000000] rounded-xl hover:bg-white transition duration-300 ease-in-out">
-                <p>Dark Mode</p>{" "}
-                <Switch
-                color="warning"
-                  type="checkbox"
-                  checked={checked}
-                  onChange={handleChange}
-                  className="ThemeToggleCheckbox"
-                />
-              </label>
-            </span>
+        {showBottomItems && (
+          <div className="absolute bottom-20 left-0 bg-amber-400 w-full p-4 rounded-xl shadow-md">
+            {SidebarLeftBottomItems.map(
+              (item, index) =>
+                item.label ===
+                (
+                  <Link
+                    to={item.path}
+                    className="flex flex-col items-center justify-center p-2 cursor-pointer hover:bg-white rounded-xl transition duration-300 ease-in-out"
+                    key={index}
+                  >
+                    {item.icon}
+                    <p className="text-xs font-semibold text-black">
+                      {item.label}
+                    </p>
+                  </Link>
+                )
+            )}
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };

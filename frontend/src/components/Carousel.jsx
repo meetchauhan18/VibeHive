@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const images = [
-  "/Images/CarouselsImages/snap.jpg",
-  "/Images/CarouselsImages/VishwaMeet.jpg",
+  "/src/assets/Images/CarouselsImages/snap.jpg",
+  "/src/assets/Images/CarouselsImages/VishwaMeet.jpg",
   "/Images/CarouselsImages/KunalMeet.jpg",
-  "https://images.pexels.com/photos/30434990/pexels-photo-30434990/free-photo-of-portrait-of-a-fluffy-dog-against-blue-sky.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "/src/assetshttps://images.pexels.com/photos/30434990/pexels-photo-30434990/free-photo-of-portrait-of-a-fluffy-dog-against-blue-sky.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
   "https://images.pexels.com/photos/30155951/pexels-photo-30155951/free-photo-of-serene-winter-landscape-with-snow-covered-trees.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
   "https://images.pexels.com/photos/30374049/pexels-photo-30374049/free-photo-of-man-walking-on-grassy-hill-under-clear-sky.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load",
   "https://images.pexels.com/photos/30387653/pexels-photo-30387653/free-photo-of-stack-of-homemade-chocolate-chip-muffins.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load",
