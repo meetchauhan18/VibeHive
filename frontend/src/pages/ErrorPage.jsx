@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Footer } from "../components/Footer";
 
 export const ErrorPage = () => {
   return (
@@ -33,16 +34,7 @@ export const ErrorPage = () => {
           removed. <Link to="/" className="text-[#005cb4]">Go back to VibeHive.</Link>
         </h3>
       </div>
-      <div className="footer-container flex flex-col justify-center items-center gap-2 w-full">
-        <div className="links-container flex flex-wrap justify-center items-center gap-3 text-sm">
-          <a href="#">About</a>
-          <a href="#">Help</a>
-          <a href="#">Blog</a>
-          <a href="#">Privacy</a>
-          <a href="#">Terms & Conditions</a>
-        </div>
-        <p className="text-sm text-center">© 2025 VibeHive Inc.</p>
-      </div>
+      <Footer />
     </div>
   );
 };

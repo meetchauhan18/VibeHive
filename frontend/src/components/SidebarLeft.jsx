@@ -28,6 +28,17 @@ export const SidebarLeft = () => {
   const [showBottomItems, setShowBottomItems] = React.useState(false);
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    // close more when screen size is changed
+    const handleResize = () => {
+      setShowBottomItems(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  });
+
   const handleChange = () => setChecked(!checked);
   const handleBottomItemClick = (label) => {
     setSelectedItem(label === selectedItem ? null : label);
@@ -124,20 +135,19 @@ export const SidebarLeft = () => {
 
   return (
     <>
-      <div className="SidebarLeft hidden lg:flex md:flex sm:flex flex-col justify-end bg-[#e6e6e6] h-screen w-18 lg:w-62 fixed top-0 left-0 overflow-visible">
-        <Link
-          to="/"
-          className="Logo fixed md:left-1 top-4 text-4xl px-0 lg:px-10 xl:px-10 py-4 font-light text-black"
-        >
-          <span className="hidden lg:block">VibeHive</span>
-          <img
-            src="/src/assets/Images/Logo/VibeHive-logo-removebg.png"
-            alt="Logo"
-            className="hidden lg:hidden md:block sm:block w-16 h-16 hover:scale-130 transition duration-300 ease-in-out cursor-pointer"
-          />
-        </Link>
-
+      <div className="SidebarLeft z-50 hidden lg:flex md:flex sm:flex flex-col justify-between bg-[#e6e6e6] fixed top-0 left-0 h-screen w-18 lg:w-56 overflow-visible">
         <div className="SidebarLeftItemsContainer flex flex-col p-2 mb-18">
+          <Link
+            to="/"
+            className="Logo text-4xl px-0 lg:px-10 xl:px-10 py-4 font-light text-black"
+          >
+            <span className="hidden lg:block">VibeHive</span>
+            <img
+              src="/src/assets/Images/Logo/VibeHive-logo-removebg.png"
+              alt="Logo"
+              className="hidden lg:hidden md:block sm:block w-16 h-16 hover:scale-130 transition duration-300 ease-in-out cursor-pointer"
+            />
+          </Link>
           {SidebarLeftItems.map((item, index) => (
             <Link
               to={item.path}
@@ -183,7 +193,7 @@ export const SidebarLeft = () => {
       </div>
 
       {selectedItem && selectedItem === "Theme appearance" && (
-        <div className="absolute bottom-22 p-2 left-0 bg-amber-400 ml-2 rounded-2xl">
+        <div className=" z-50 absolute bottom-22 p-2 left-0 bg-amber-400 ml-2 rounded-2xl">
           <span className="flex items-center gap-4 p-6 py-4">
             <RiArrowLeftSLine
               className="cursor-pointer"
@@ -212,18 +222,13 @@ export const SidebarLeft = () => {
         </div>
       )}
 
-      {
-        useEffect(() => {
-          
-          if (selectedItem &&selectedItem === "Logout") {
-            handleLogout();
-          }
-        }, [handleLogout, selectedItem])
+      {useEffect(() => {
+        if (selectedItem && selectedItem === "Logout") {
+          handleLogout();
+        }
+      }, [handleLogout, selectedItem])}
 
-    
-      }
-
-      <div className="lg:hidden md:hidden sm:hidden fixed bottom-0 left-0 w-full bg-[#e6e6e6] flex justify-around items-center p-2 shadow-md">
+      <div className="z-50 lg:hidden md:hidden sm:hidden fixed bottom-0 left-0 w-full bg-[#e6e6e6] flex justify-around items-center p-2 shadow-md">
         {SidebarLeftItems.filter(
           (item) => item.label !== "Search" && item.label !== "Notification"
         ).map((item, index) => (
@@ -264,6 +269,42 @@ export const SidebarLeft = () => {
             )}
           </div>
         )}
+
+        <div className=" lg:hidden md:hidden sm:hidden fixed top-0 left-0 h-14 w-full bg-[#e6e6e6] flex justify-between items-center p-2 shadow-md">
+          <div className="logo-top-small-size">
+            <Link to="/" className="flex items-center pl-2">
+              <span className="text-2xl font-light text-black">VibeHive</span>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                name="search"
+                placeholder="Search"
+                className="flex items-center h-9 w-auto justify-center px-10 cursor-pointer bg-white rounded-lg transition duration-300 ease-in-out active:outline-none focus:outline-none"
+              />
+              <RiSearchLine
+                size={18}
+                color="gray"
+                className="absolute left-3 border-0"
+              />
+            </div>
+
+            {SidebarLeftItems.filter(
+              (item) => item.label === "Notification"
+            ).map((item, index) => (
+              <Link
+                to={item.path}
+                className="flex items-center w-auto justify-center p-2 cursor-pointer"
+                key={index}
+              >
+                {item.icon}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );

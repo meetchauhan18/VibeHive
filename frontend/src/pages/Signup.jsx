@@ -24,7 +24,7 @@ export const Signup = () => {
     console.log(formData);
     try {
       const res = await axios.post(
-        `http://localhost:5000/hive/signup`,
+        `http://localhost:8000/hive/signup`,
         formData,
         {
           headers: { "Content-Type": "application/json" },
