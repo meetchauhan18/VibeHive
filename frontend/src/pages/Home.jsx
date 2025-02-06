@@ -5,7 +5,7 @@ import { SidebarRight } from "../components/SidebarRight.jsx"
 
 export const Home = () => {
   return (
-    <div className="ml-0 lg:ml-56 md:ml-18 sm:ml-18 flex bg-cyan-100 overflow-auto">
+    <div className="ml-0 lg:ml-56 md:ml-18 sm:ml-18 flex overflow-auto bg-[white]">
       <div className="flex-grow">
         <Story />
         <Feed />

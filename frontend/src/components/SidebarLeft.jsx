@@ -21,17 +21,24 @@ import {
 import Avatar from "@mui/material/Avatar";
 import axios from "axios";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { setAuthUser } from "../utils/authSlice";
 
 export const SidebarLeft = () => {
   const [checked, setChecked] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showBottomItems, setShowBottomItems] = React.useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  const avatar = user?.avatar || "";
 
   React.useEffect(() => {
     // close more when screen size is changed
     const handleResize = () => {
       setShowBottomItems(false);
+      selectedItem && setSelectedItem(null);
+      console.log(avatar);
     };
     window.addEventListener("resize", handleResize);
     return () => {
@@ -51,11 +58,12 @@ export const SidebarLeft = () => {
 
   const handleLogout = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5000/hive/logout", {
+      const res = await axios.get("http://localhost:8000/hive/logout", {
         withCredentials: true,
       });
 
       if (res.status === 200) {
+        dispatch(setAuthUser(null));
         toast.success(res.data.message);
         navigate("/accounts/signin");
       }
@@ -102,7 +110,7 @@ export const SidebarLeft = () => {
       icon: (
         <Avatar
           alt="Profile"
-          src="/src/assets/Images/CarouselsImages/KunalMeet.jpg"
+          src={avatar}
           sx={{ width: 28, height: 28 }}
         />
       ),
@@ -135,7 +143,7 @@ export const SidebarLeft = () => {
 
   return (
     <>
-      <div className="SidebarLeft z-50 hidden lg:flex md:flex sm:flex flex-col justify-between bg-[#e6e6e6] fixed top-0 left-0 h-screen w-18 lg:w-56 overflow-visible">
+      <div className="SidebarLeft z-50 hidden lg:flex md:flex sm:flex flex-col justify-between bg-[white] border-r border-gray-200 fixed top-0 left-0 h-screen w-18 lg:w-56 overflow-visible">
         <div className="SidebarLeftItemsContainer flex flex-col p-2 mb-18">
           <Link
             to="/"
@@ -193,7 +201,7 @@ export const SidebarLeft = () => {
       </div>
 
       {selectedItem && selectedItem === "Theme appearance" && (
-        <div className=" z-50 absolute bottom-22 p-2 left-0 bg-amber-400 ml-2 rounded-2xl">
+        <div className="z-60 fixed bottom-18 p-2 left-0 bg-amber-400 ml-2 rounded-2xl">
           <span className="flex items-center gap-4 p-6 py-4">
             <RiArrowLeftSLine
               className="cursor-pointer"

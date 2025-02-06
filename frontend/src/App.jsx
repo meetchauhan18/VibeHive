@@ -7,6 +7,7 @@ import { Home } from "./pages/Home.jsx";
 import { Profile } from "./pages/Profile.jsx";
 import { ErrorPage } from "./pages/ErrorPage.jsx";
 
+
 const browserRouter = createBrowserRouter([
   {
     path: "/",
@@ -33,7 +34,7 @@ const browserRouter = createBrowserRouter([
   {
     path: "*",
     element: <ErrorPage />,
-  }
+  },
 ]);
 
 function App() {

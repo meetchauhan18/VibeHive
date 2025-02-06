@@ -4,12 +4,21 @@ import Dialog from "@mui/material/Dialog";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItem";
-import { RiBookmarkLine, RiChat3Line, RiHeartLine, RiMoreLine, RiSendPlane2Line } from "@remixicon/react";
+import {
+  RiBookmarkLine,
+  RiChat3Line,
+  RiHeartLine,
+  RiMoreLine,
+  RiSendPlane2Line,
+} from "@remixicon/react";
 import { DialogActions, ListItemText } from "@mui/material";
+import { CommentDialog } from "./CommentDialog";
 
 export const Post = () => {
   const [open, setOpen] = React.useState(false);
+  const [openCommentDialog, setOpenCommentDialog] = React.useState(false);
   const [selectedValue, setSelectedValue] = React.useState(null);
+  const [commentText, setCommentText] = React.useState("");
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -20,6 +29,20 @@ export const Post = () => {
     if (selectedValue === "cancel") {
       setOpen(false);
     }
+  };
+
+  const changeEventHandler = (event) => {
+    const inputText = setCommentText(event.target.value);
+
+    if (inputText.trim()) {
+      setCommentText(inputText);
+    } else {
+      setCommentText("");
+    }
+  };
+
+  const sendMessageHandler = async () => {
+    alert(commentText);
   };
 
   const moreOptions = [
@@ -35,7 +58,7 @@ export const Post = () => {
   ];
 
   return (
-    <div className="PostCard max-w-md w-full mx-auto my-1 bg-amber-400">
+    <div className="PostCard max-w-md w-full mx-auto my-4 ">
       <div className="postHeader flex justify-between p-3">
         <div className="postHeaderLeft flex gap-2">
           <Avatar
@@ -44,7 +67,7 @@ export const Post = () => {
             sx={{ width: 40, height: 40 }}
           />
           <span>
-            <p className="text-xs font-semibold">meetchauhan_1721</p>
+            <p className="text-sm font-semibold">meetchauhan_1721</p>
           </span>
         </div>
         <div className="postHeaderRight">
@@ -55,16 +78,22 @@ export const Post = () => {
             size={28}
           />
 
-          <Dialog open={open} onClose={handleChange} sx={{ fullWidth: true, maxWidth: 'lg', borderRadius: "15px"}}>
-            <DialogActions >
+          <Dialog
+            open={open}
+            onClose={handleChange}
+            sx={{ fullWidth: true, maxWidth: "lg", borderRadius: "15px" }}
+          >
+            <DialogActions>
               <List>
                 {moreOptions.map((option) => (
-                  <ListItem disablePadding
-                    
-                    key={option.value}
-                  >
+                  <ListItem disablePadding key={option.value}>
                     <ListItemButton
-                      sx={{ width: "350px", textAlign: "center", '&:hover': { backgroundColor: '#e6e6e6'}, borderRadius: "5px" }}
+                      sx={{
+                        width: "350px",
+                        textAlign: "center",
+                        "&:hover": { backgroundColor: "#e6e6e6" },
+                        borderRadius: "5px",
+                      }}
                       onClick={() => handleChange(option.value)}
                     >
                       <ListItemText primary={option.label} />
@@ -78,7 +107,8 @@ export const Post = () => {
       </div>
 
       <div className="postBody">
-        <img className="rounded-md border border-red-100"
+        <img
+          className="rounded-md border border-red-100"
           src="src/assets/Images/CarouselsImages/KunalMeet.jpg"
           alt="Post Image"
         />
@@ -86,12 +116,11 @@ export const Post = () => {
       <div className="postFooter p-3">
         <div className="postInteractions flex justify-between">
           <div className="postInteractionLeft flex gap-3">
-            <RiHeartLine
-              className="cursor-pointer"
-              color="black"
-              size={28}
-            />
+            <RiHeartLine className="cursor-pointer" color="black" size={28} />
             <RiChat3Line
+              onClick={() => {
+                setOpenCommentDialog(true);
+              }}
               className="cursor-pointer"
               color="black"
               size={28}
@@ -105,21 +134,50 @@ export const Post = () => {
           <div className="postInteractionRight">
             <RiBookmarkLine
               className="cursor-pointer"
-              color="black" 
+              color="black"
               size={28}
             />
           </div>
-
         </div>
         <p className="text-sm">
-          liked by <span className="font-semibold">vishwa8976</span> and <span className="font-semibold">others</span>
+          liked by <span className="font-semibold">vishwa8976</span> and{" "}
+          <span className="font-semibold">others</span>
         </p>
         <p className="text-sm">
-          <span className="font-semibold">meetchauhan_1721</span> <span >Bataku</span>
+          <span className="font-semibold">meetchauhan_1721</span>{" "}
+          <span>Bataku</span>
         </p>
-        <span className="text-sm text-gray-400">View all comments</span>
+        <span
+          onClick={() => {
+            setOpenCommentDialog(true);
+          }}
+          className="text-sm text-gray-400 cursor-pointer"
+        >
+          View all comments
+        </span>
+        <div className="postCommentInput  border-gray-500 flex">
+          <input
+            type="text"
+            value={commentText}
+            onChange={changeEventHandler}
+            placeholder="add a comment..."
+            className="w-full  outline-none"
+          />
+          <button
+            disabled={!commentText.trim()}
+            onClick={sendMessageHandler}
+            className={`cursor-pointer font-semibold p-2 ${
+              !commentText.trim() ? "text-gray-500" : "text-blue-500"
+            }`}
+          >
+            Send
+          </button>
+        </div>
       </div>
-      
+      <CommentDialog
+        openCommentDialog={openCommentDialog}
+        setOpenCommentDialog={setOpenCommentDialog}
+      />
     </div>
   );
 };

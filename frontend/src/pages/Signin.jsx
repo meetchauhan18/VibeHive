@@ -3,9 +3,12 @@ import Carousel from "../components/Carousel.jsx";
 import axios from "axios";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "../utils/authSlice.js";
 
 export const Signin = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = React.useState({
     usernameoremail: "",
@@ -34,8 +37,8 @@ export const Signin = () => {
       );
 
       if (res.status === 200) {
+        dispatch(setAuthUser(res.data.user));
         navigate("/");
-
         console.log(res.data.message);
         toast.success(res.data.message);
       }
